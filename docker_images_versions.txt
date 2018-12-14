@@ -1,0 +1,46 @@
+#MOST_RECENT_IMAGES
+gatk	broadinstitute/gatk
+bwa	bwa_v1
+samtools	bwa_samtools131
+bwa_samtools131	bwa_samtools131
+vt	quay.io/biocontainers/vt:0.57721--hf74b74d_1
+varscan	opengenomics/varscan:latest
+bcftools	bcftools:1.9
+vep	willmclaren/ensembl-vep:latest
+
+#GATK4_germline_v1
+gatk	latest
+bwa	latest
+samtools	latest
+bwa_samtools131	latest
+vt	latest
+bcftools	latest
+vep	latest
+
+#GATK4_somatic_TN_v1
+gatk	latest
+bwa	latest
+samtools	latest
+bwa_samtools131	latest
+vt	latest
+bcftools	latest
+vep	latest
+
+#GATK4_somatic_TO_v1
+gatk	latest
+bwa	latest
+samtools	latest
+bwa_samtools131	latest
+vt	latest
+bcftools	latest
+vep	latest
+
+#GATK_varscan_TN_v1
+gatk	latest
+bwa	latest
+samtools	latest
+bwa_samtools131	latest
+vt	latest
+varscan	latest
+bcftools	latest
+vep	latest
