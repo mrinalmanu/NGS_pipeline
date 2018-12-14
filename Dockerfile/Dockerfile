@@ -15,4 +15,6 @@ RUN docker pull wasa000/bwa_samtools131
 RUN docker pull bcftools:1.9
 RUN docker pull willmclaren/ensembl-vep:latest
 RUN docker pull broadinstitute/gatk
+RUN git clone https://github.com/ptriska/NGS_pipeline/ /home/NGS_pipeline/
+
 
