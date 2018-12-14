@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/mnt/storage/clip/NGS_pipeline/pipelines')
+sys.path.append('/home/NGS_pipeline/pipelines')
 from pipelines import *
 from GATK4_germline_v1_all_docker import GATK4_germline_v1
 from GATK4_somatic_TN_v1 import GATK4_somatic_TN_v1
