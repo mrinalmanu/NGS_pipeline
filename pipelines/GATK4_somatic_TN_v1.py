@@ -11,13 +11,8 @@ from multiprocessing import Process
 
 ### PATH DEFINITIONS #############################################################################
 
-base_folder = "/mnt/storage/clip/NGS_pipeline/"
-#tools_dir = base_folder+ "tools/"
-reference_folder = "/mnt/storage/clip/Reference/"
-#output_folder = base_folder
-#gatk_binary = tools_dir+ "gatk-4.0.10.0/./gatk"
-#bwa_binary= tools_dir+ "/bwa-0.7.17/./bwa"
-#samtools_binary = "samtools"
+base_folder = "/home/NGS_pipeline/"
+reference_folder = "/home/Reference/"
 bwa_index_GRCh38 = reference_folder+"/hg38_gatk/v0/"
 bwa_index_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/"
 reference_fasta_GRCh38 = reference_folder+"/hg38_gatk/v0/Homo_sapiens_assembly38.fasta"
@@ -25,7 +20,6 @@ reference_fasta_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_
 dbsnp_vcf_GRCh38 = reference_folder+"/GRCh38/hg38_broad_bundle/dbsnp_146.hg38.vcf.gz"
 dbsnp_vcf_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/dbsnp_137.hg19.vcf"
 vep_reference_folder_hg19 = reference_folder+"/hg19_old_functional/"
-fastq_location="/mnt/storage/clip/NGS_pipeline/TEST/input/"
 
 ### END OF PATH DEFINITIONS ######################################################################
 
