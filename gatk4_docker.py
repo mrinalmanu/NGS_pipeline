@@ -3,7 +3,7 @@ import os
 import subprocess
 
 
-java_tempdir="/mnt/storage/clip/NGS_pipeline/java_temp"
+java_tempdir="/home/NGS_pipeline/java_temp"
 
 def check_path(path):                		## Check if file exists
 		if os.path.exists(path) == True:
