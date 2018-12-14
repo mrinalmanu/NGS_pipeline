@@ -1,0 +1,2 @@
+SAMPLE_ID,PIPELINE,GENOME_BUILD,FASTQ1,FASTQ2,FASTQ1_TUMOR,FASTQ2_TUMOR,CLEANUP LIB_ID,PL_ID,PU_ID
+sample1,GATK4_somatic_TN_v1,hg19,/mnt/storage/clip/NGS_pipeline/TEST/input/chr1.end1.fastq,/mnt/storage/clip/NGS_pipeline/TEST/input/chr1.end2.fastq,/mnt/storage/clip/NGS_pipeline/TEST/input/chr1.end1.fastq,/mnt/storage/clip/NGS_pipeline/TEST/input/chr1.end2.fastq,NO,lib1,Illumina,XXX
