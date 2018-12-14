@@ -13,6 +13,7 @@ from multiprocessing import Process
 
 base_folder = "/home/NGS_pipeline/"
 reference_folder = "/home/Reference/"
+output_folder = "/home/output/"
 bwa_index_GRCh38 = reference_folder+"/hg38_gatk/v0/"
 bwa_index_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/"
 reference_fasta_GRCh38 = reference_folder+"/hg38_gatk/v0/Homo_sapiens_assembly38.fasta"
@@ -57,7 +58,7 @@ class GATK4_somatic_TN_v1():
 		self.lib_ID = lib_ID
 		self.pl_ID = pl_ID
 		self.pu_ID = pu_ID
-		self.output_folder = base_folder+"RUN/"+self.sample_name+"/output/"
+		self.output_folder = output_folder+"/"+self.sample_name+"/GATK4_somatic/output/"
 		
 		if check_path(self.output_folder)==False:
 			print ("MKDIR", self.output_folder)			
