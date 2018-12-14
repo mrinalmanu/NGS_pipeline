@@ -11,8 +11,8 @@ from multiprocessing import Process
 
 ### PATH DEFINITIONS #############################################################################
 
-base_folder = "/mnt/storage/clip/NGS_pipeline/"
-reference_folder = "/mnt/storage/clip/Reference"
+base_folder = "/home/NGS_pipeline/"
+reference_folder = "/home/Reference"
 output_folder = base_folder
 bwa_index_GRCh38 = reference_folder+"/GRCh38/hg38_broad_bundle/"
 bwa_index_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/"
