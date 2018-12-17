@@ -10,7 +10,7 @@ import time
 import multiprocessing
 
 sample_file=open(sys.argv[1]).read().splitlines()
-docker_images_versions=open(sys.argv[2]).read().split('#')
+docker_images_versions=open("/home/NGS_pipeline/docker_images_versions.txt").read().split('#')
 minimum_cores = 10
 
 ################ PARSE IMAGE VERSIONS ##################
