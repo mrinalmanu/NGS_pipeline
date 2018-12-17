@@ -1,4 +1,4 @@
-base_folder = "/home/NGS_pipeline/"
+base_folder = "/home/"
 reference_folder = "/home/Reference/"
 output_folder = "/home/output/"
 bwa_index_GRCh38 = reference_folder+"/hg38_gatk/v0/"
