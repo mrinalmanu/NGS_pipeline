@@ -69,7 +69,8 @@ class GATK4_germline_v1():
 			container_name = self.sample_name+"_"+cmd[0]
 		checkContainer(container_name)
 		dcmd = ["docker", "run","--name",container_name,
-						"-v", "{}:{}".format(base_folder, base_folder),
+						"-v", "{}:{}".format(self.input_folder, self.input_folder),
+						"-v", "{}:{}".format(output_folder, output_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
 						image]
 		dcmd += cmd
@@ -135,7 +136,7 @@ class GATK4_germline_v1():
 									}
 			markDuplicates_log = self.output_folder+self.sample_name+".MarkDuplicates.log"
 			gatk_docker("gatk_mark_duplicates",parameters_dict,
-						markDuplicates_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						markDuplicates_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def addReadGroups():
 			# Add read groups (GATK)
@@ -191,7 +192,7 @@ class GATK4_germline_v1():
 								}
 			HaplotypeCaller_log = input_bam+".HaplotypeCaller.log"
 			gatk_docker("gatk_haplotype_caller", parameters_dict,
-						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"])
 
 			
 		def validateSam():
@@ -202,7 +203,7 @@ class GATK4_germline_v1():
 								}
 			validate_log = output_folder+self.sample_name+".validateSamFile.log"
 			gatk_docker(gatk_validate_sam, parameters_dict,
-						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"])
 
 		def indexBam(path):
 			if check_path(path) == True:
