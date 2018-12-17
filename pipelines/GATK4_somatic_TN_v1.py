@@ -71,7 +71,7 @@ class GATK4_somatic_TN_v1():
 						"-v", "{}:{}".format(self.input_folder, self.input_folder),
 						"-v", "{}:{}".format(output_folder, output_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
-						self.docker_images_dict[image]]
+						image]
 		dcmd += cmd
 	
 		if stdout is not None:
