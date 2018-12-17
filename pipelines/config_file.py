@@ -8,5 +8,4 @@ reference_fasta_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_
 dbsnp_vcf_GRCh38 = reference_folder+"/GRCh38/hg38_broad_bundle/dbsnp_146.hg38.vcf.gz"
 dbsnp_vcf_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/dbsnp_137.hg19.vcf"
 vep_reference_folder_hg19 = reference_folder+"/hg19_old_functional/"
-fastq_location="/mnt/storage/clip/NGS_pipeline/TEST/input/"
 max_nr_threads= "20"
