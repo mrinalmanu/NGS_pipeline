@@ -138,7 +138,7 @@ class GATK_varscan_TN_v1():
 								}
 			ReadGroups_log = self.output_folder+t_n_sample_name+".ReadGroups."+t_n+".log"
 			gatk_docker("gatk_add_read_groups", parameters_dict,
-						ReadGroups_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+						ReadGroups_log, self.ram,self.docker_images_dict["gatk"])
 	
 		def buildRecalibrator(t_n):
 			# Base recalibrator (GATK)
@@ -151,7 +151,7 @@ class GATK_varscan_TN_v1():
 								}
 			BaseRecalibrator_log = self.output_folder+t_n_sample_name+".BaseRecalibrator."+t_n+".log"
 			gatk_docker("gatk_build_recalibrator", parameters_dict,
-						BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+						BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"])
 
 			
 		def applyRecalibrator(t_n):
@@ -167,7 +167,7 @@ class GATK_varscan_TN_v1():
 								}
 			ApplyBQSR_log = self.output_folder+t_n_sample_name+".ApplyBQSR."+t_n+".log"
 			gatk_docker("gatk_apply_recalibrator", parameters_dict,
-						ApplyBQSR_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+						ApplyBQSR_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def variantCalling_mutect2():
 			# Haplotype caller
