@@ -34,7 +34,7 @@ class GATK4_somatic_TN_v1():
 		if (f1 =="") or (f2 =="") or (tf1 =="") or (tf2 ==""):
 			print >>sys.stderr, t_n_sample_name+": FASTQ file is missing, aborting."
 			quit()
-		self.input_folder="/".join(tf1.split("/")[0:-1])+"/"
+		self.input_folder= input_folder
 		self.threads = max_nr_threads
 		self.ram = "50000"
 		self.open_files = []
