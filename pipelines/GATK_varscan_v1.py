@@ -6,24 +6,7 @@ import subprocess
 import logging
 import os
 from gatk4_docker import gatk_docker
-
-### PATH DEFINITIONS #############################################################################
-
-base_folder = "/mnt/storage/clip/NGS_pipeline/"
-#tools_dir = base_folder+ "tools/"
-reference_folder = "/mnt/storage/clip/Reference/"
-output_folder = base_folder
-#gatk_binary = tools_dir+ "gatk-4.0.10.0/./gatk"
-#bwa_binary= tools_dir+ "/bwa-0.7.17/./bwa"
-#samtools_binary = "samtools"
-bwa_index_GRCh38 = reference_folder+"/hg38_gatk/v0/"
-bwa_index_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/"
-reference_fasta_GRCh38 = reference_folder+"/hg38_gatk/v0/Homo_sapiens_assembly38.fasta"
-reference_fasta_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/ucsc.hg19.fasta"
-dbsnp_vcf_GRCh38 = reference_folder+"/GRCh38/hg38_broad_bundle/dbsnp_146.hg38.vcf.gz"
-dbsnp_vcf_hg19 = reference_folder+"/hg19_old_functional/broad_bundle_hg19_v2.5/dbsnp_137.hg19.vcf"
-
-### END OF PATH DEFINITIONS ######################################################################
+from config_file import *
 
 def check_path(path):                		## Check if file exists
 		if os.path.exists(path) == True:
@@ -50,7 +33,7 @@ class GATK_varscan_TN_v1():
 			print >>sys.stderr, t_n_sample_name+": FASTQ file is missing, aborting."
 			quit()
 			
-		self.threads = "50"
+		self.threads = max_nr_threads
 		self.ram = "50000"
 		self.open_files = []
 		self.genome_build = genome_build
