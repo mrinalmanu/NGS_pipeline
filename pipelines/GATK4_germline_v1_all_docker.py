@@ -150,7 +150,7 @@ class GATK4_germline_v1():
 								}
 			ReadGroups_log = self.output_folder+self.sample_name+".ReadGroups.log"
 			gatk_docker("gatk_add_read_groups", parameters_dict,
-						ReadGroups_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+						ReadGroups_log, self.ram,self.docker_images_dict["gatk"])
 	
 		def buildRecalibrator():
 			# Base recalibrator (GATK)
@@ -163,7 +163,7 @@ class GATK4_germline_v1():
 								}
 			BaseRecalibrator_log = output_folder+self.sample_name+".BaseRecalibrator.log"
 			gatk_docker("gatk_build_recalibrator", parameters_dict,
-						BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+						BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"])
 
 			
 		def applyRecalibrator():
@@ -179,7 +179,7 @@ class GATK4_germline_v1():
 								}
 			ApplyBQSR_log = output_folder+self.sample_name+".ApplyBQSR.log"
 			gatk_docker("gatk_apply_recalibrator", parameters_dict,
-						ApplyBQSR_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+						ApplyBQSR_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def variantCalling_HaplotypeCaller(input_bam):
 			# Haplotype caller
