@@ -1,4 +1,3 @@
-base_folder = "/home/"
 reference_folder = "/mnt/storage/clip/Reference/"
 output_folder = "/mnt/storage/clip/NGS_pipeline/RUN/"
 input_folder = "/mnt/storage/clip/NGS_pipeline/TEST/input/"
