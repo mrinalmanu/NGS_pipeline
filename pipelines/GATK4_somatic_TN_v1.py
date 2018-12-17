@@ -119,7 +119,7 @@ class GATK4_somatic_TN_v1():
 								}
 			mutect2_log = self.output_folder+self.sample_name+".Mutect2.log"
 			gatk_docker("gatk_mutect2", parameters_dict,
-						mutect2_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						mutect2_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def variantCalling_mutect2_partial(chromosome):
 			# variant caller
@@ -138,7 +138,7 @@ class GATK4_somatic_TN_v1():
 								}
 			mutect2_log = self.output_folder+self.sample_name+".chr"+chromosome+".Mutect2.log"
 			gatk_docker("gatk_mutect2", parameters_dict,
-						mutect2_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)				
+						mutect2_log, self.ram,self.docker_images_dict["gatk"])				
 
 		
 	
@@ -150,7 +150,7 @@ class GATK4_somatic_TN_v1():
 								}
 			validate_log = self.output_folder+t_n_sample_name+".validateSamFile."+t_n+".log"
 			gatk_docker(gatk_validate_sam, parameters_dict,
-						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def processVcf(input_vcf, filename):
 			# decompose and normalize variants in vt 
@@ -165,7 +165,7 @@ class GATK4_somatic_TN_v1():
 								}
 			filter_log = self.output_folder+self.sample_name+".filter.log"
 			gatk_docker("gatk_filter_mutect", parameters_dict,
-						filter_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						filter_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def annotateVep(vcf_file):
 			# annotation in Variant Effect Predictor
@@ -272,7 +272,7 @@ class GATK4_somatic_TN_v1():
 										}
 				markDuplicates_log = self.output_folder+t_n_sample_name+".MarkDuplicates.log"
 				gatk_docker("gatk_mark_duplicates",parameters_dict,
-							markDuplicates_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+							markDuplicates_log, self.ram,self.docker_images_dict["gatk"])
 			
 			def addReadGroups(t_n):
 				# Add read groups (GATK)
@@ -286,7 +286,7 @@ class GATK4_somatic_TN_v1():
 									}
 				ReadGroups_log = self.output_folder+t_n_sample_name+".ReadGroups."+t_n+".log"
 				gatk_docker("gatk_add_read_groups", parameters_dict,
-							ReadGroups_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+							ReadGroups_log, self.ram,self.docker_images_dict["gatk"])
 			
 			def addReadGroups_partial_bam(chromosome, input_bam):
 				# Add read groups (GATK)
@@ -300,7 +300,7 @@ class GATK4_somatic_TN_v1():
 									}
 				ReadGroups_log = self.output_folder+t_n_sample_name+".ReadGroups.log"
 				gatk_docker("gatk_add_read_groups", parameters_dict,
-							ReadGroups_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)				
+							ReadGroups_log, self.ram,self.docker_images_dict["gatk"])				
 		
 			def buildRecalibrator(t_n):
 				# Base recalibrator (GATK)
@@ -313,7 +313,7 @@ class GATK4_somatic_TN_v1():
 									}
 				BaseRecalibrator_log = self.output_folder+t_n_sample_name+".BaseRecalibrator."+t_n+".log"
 				gatk_docker("gatk_build_recalibrator", parameters_dict,
-							BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+							BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"])
 	
 				
 			def applyRecalibrator(t_n):
@@ -329,7 +329,7 @@ class GATK4_somatic_TN_v1():
 									}
 				ApplyBQSR_log = self.output_folder+t_n_sample_name+".ApplyBQSR."+t_n+".log"
 				gatk_docker("gatk_apply_recalibrator", parameters_dict,
-							ApplyBQSR_log, self.ram,self.docker_images_dict["gatk"],base_folder, reference_folder)
+							ApplyBQSR_log, self.ram,self.docker_images_dict["gatk"])
 			
 			def sortBam(unsorted_bam, sorted_bam, t_n):
 				if check_path(unsorted_bam) == True:
