@@ -35,7 +35,7 @@ class GATK4_germline_v1():
 		if (tf1 !="") or (tf2 !=""):
 			print (self.sample_name+": ERROR: tumor FASTQ file specified in germline pipeline, aborting.")
 			quit()
-		
+		self.input_folder=input_folder
 		self.threads = max_nr_threads
 		self.ram = "50000"
 		self.open_files = []
