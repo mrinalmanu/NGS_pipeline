@@ -27,15 +27,15 @@ class GATK4_somatic_TN_v1():
 	def __init__(self, sample_name, genome_build, f1, f2,tf1,tf2, cleanup,lib_ID, pl_ID, pu_ID, docker_images_dict):
 
 		self.sample_name= sample_name
-		self.fastq1_tumor = fastq_location+tf1
-		self.fastq2_tumor = fastq_location+tf2
-		self.fastq1 = fastq_location+f1
-		self.fastq2 = fastq_location+f2
+		self.fastq1_tumor = tf1
+		self.fastq2_tumor = tf2
+		self.fastq1 = f1
+		self.fastq2 = f2
 		if (f1 =="") or (f2 =="") or (tf1 =="") or (tf2 ==""):
 			print >>sys.stderr, t_n_sample_name+": FASTQ file is missing, aborting."
 			quit()
-			
-		self.threads = "20"
+		self.input_folder="/".join(tf1.split("/")[0:-1])+"/"
+		self.threads = max_nr_threads
 		self.ram = "50000"
 		self.open_files = []
 		self.genome_build = genome_build
@@ -68,7 +68,8 @@ class GATK4_somatic_TN_v1():
 	
 		checkContainer(container_name)
 		dcmd = ["docker", "run","--name",container_name,
-						"-v", "{}:{}".format(base_folder, base_folder),
+						"-v", "{}:{}".format(self.input_folder, self.input_folder),
+						"-v", "{}:{}".format(output_folder, output_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
 						self.docker_images_dict[image]]
 		dcmd += cmd
