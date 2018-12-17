@@ -4,7 +4,7 @@ import subprocess
 from config_file import *
 
 
-java_tempdir="/home/NGS_pipeline/java_temp"
+java_tempdir=output_folder
 
 def check_path(path):                		## Check if file exists
 		if os.path.exists(path) == True:
