@@ -81,7 +81,7 @@ def gatk_docker(tool, parameters_dict, log, ram, image):
 		"--name",
 		container_name,
 		"-v",
-		"{}:{}".format(self.input_folder, self.input_folder),
+		"{}:{}".format(input_folder, input_folder),
 		"-v",
 		"{}:{}".format(output_folder, output_folder),
 		"-v",
