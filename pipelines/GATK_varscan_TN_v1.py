@@ -62,7 +62,8 @@ class GATK_varscan_TN_v1():
 		container_name = self.sample_name+"_"+t_n+"_"+cmd[0]
 		checkContainer(container_name)
 		dcmd = ["docker","run","--name",container_name,
-						"-v", "{}:{}".format(base_folder, base_folder),
+						"-v", "{}:{}".format(self.input_folder, self.input_folder),
+						"-v", "{}:{}".format(output_folder, output_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
 						image]
 		dcmd += cmd
@@ -123,7 +124,7 @@ class GATK_varscan_TN_v1():
 									}
 			markDuplicates_log = self.output_folder+t_n_sample_name+".MarkDuplicates.log"
 			gatk_docker("gatk_mark_duplicates",parameters_dict,
-						markDuplicates_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						markDuplicates_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def addReadGroups(t_n):
 			# Add read groups (GATK)
@@ -185,7 +186,7 @@ class GATK_varscan_TN_v1():
 								}
 			mutect2_log = self.output_folder+self.sample_name+".Mutect2.log"
 			gatk_docker("gatk_mutect2", parameters_dict,
-						mutect2_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						mutect2_log, self.ram,self.docker_images_dict["gatk"])
 		def variantCalling_varscan2():
 			varscan_cmd = ["java", "-jar" ,"VarScan.jar","somatic", self.output_folder+self.sample_name+"_r_normal.bam.pileup",self.output_folder+self.sample_name+"_r_tumor.bam.pileup", self.output_folder+self.sample_name,"--output-vcf"]
 			index_log= self.output_folder+self.sample_name+".varscan2.log"
@@ -199,7 +200,7 @@ class GATK_varscan_TN_v1():
 								}
 			validate_log = self.output_folder+t_n_sample_name+".validateSamFile."+t_n+".log"
 			gatk_docker(gatk_validate_sam, parameters_dict,
-						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"], base_folder, reference_folder)
+						HaplotypeCaller_log, self.ram,self.docker_images_dict["gatk"])
 		
 		def sortBam(unsorted_bam, sorted_bam, t_n):
 			if check_path(unsorted_bam) == True:
