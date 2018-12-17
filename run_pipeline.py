@@ -9,11 +9,12 @@ from multiprocessing import Process
 import time
 import multiprocessing
 
+################ INPUT SAMPLE FILE ######################
 sample_file=open(sys.argv[1]).read().splitlines()
 docker_images_versions=open("/home/NGS_pipeline/docker_images_versions.txt").read().split('#')
 minimum_cores = 10
 
-################ PARSE IMAGE VERSIONS ##################
+################ PARSE DOCKER IMAGE VERSIONS FROM FILE ##################
 latest_dict={}
 pipelines_tools_dict={}
 for paragraph in docker_images_versions:
@@ -66,8 +67,9 @@ for line in sample_file[1:]:
 	print (fastq2)
 	print (fastq1_tumor)
 	print (fastq2_tumor)
-	#quit()
-	
+##################### END SAMPLE LIST PARSING #########################
+
+############### CREATE INSTANCES OF PIPELINE CLASS FOR SAMPLES ########
 	if pipeline_ID == "GATK4_germline_v1":
 		instances_list.append(GATK4_germline_v1(sample_ID, genome_build, fastq1, fastq2, fastq1_tumor, fastq2_tumor, cleanup,lib,pl,pu, pipelines_tools_dict[pipeline_ID]))
 	elif pipeline_ID == "GATK4_somatic_TN_v1":
@@ -79,12 +81,9 @@ for line in sample_file[1:]:
 	
 	else:
 		print ("Sample "+sample_ID+": pipeline "+pipeline+" not available")
-##################### END SAMPLE LIST PARSING #########################
 
 
 ##################### SEND SAMPLES TO PIPELINE #########################
-
-
 def machine_busy(nr_threads): ##Check load on machine before submiting job
 	import psutil
 	import numpy as np
@@ -111,7 +110,7 @@ def machine_busy(nr_threads): ##Check load on machine before submiting job
 
 def run(instance):
 	instance.run_pipeline()
-
+################## RUN SAMPLE IF ENOUGH CORES ###########
 for instance in instances_list:
 	wait_for_cores = machine_busy(minimum_cores)
 	while wait_for_cores==True:
