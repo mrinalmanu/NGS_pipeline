@@ -1,5 +1,5 @@
 base_folder = "/home/"
-reference_folder = "/mnt/storage/References/"
+reference_folder = "/mnt/storage/Reference/"
 output_folder = "/mnt/storage/clip/NGS_pipeline/RUN/"
 input_folder = "/mnt/storage/clip/NGS_pipeline/TEST/input/"
 bwa_index_GRCh38 = reference_folder+"/hg38_gatk/v0/"
