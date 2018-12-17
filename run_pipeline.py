@@ -3,7 +3,7 @@ sys.path.append('/home/NGS_pipeline/pipelines')
 from pipelines import *
 from GATK4_germline_v1_all_docker import GATK4_germline_v1
 from GATK4_somatic_TN_v1 import GATK4_somatic_TN_v1
-from GATK4_somatic_TO_v1 import GATK4_somatic_TO_v1
+#from GATK4_somatic_TO_v1 import GATK4_somatic_TO_v1
 from GATK_varscan_TN_v1 import GATK_varscan_TN_v1
 from multiprocessing import Process
 import time
