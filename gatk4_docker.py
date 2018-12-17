@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+from config_file import *
 
 
 java_tempdir="/home/NGS_pipeline/java_temp"
@@ -18,7 +19,7 @@ def checkContainer(container_name):
 		else:
 			return	
 
-def gatk_docker(tool, parameters_dict, log, ram, image, base_folder, reference_folder):
+def gatk_docker(tool, parameters_dict, log, ram, image):
 	container_name = (log.split("/")[-1]).replace(".log","")
 	checkContainer(container_name)
 
@@ -75,7 +76,17 @@ def gatk_docker(tool, parameters_dict, log, ram, image, base_folder, reference_f
 	
 	
 	""" Run a command inside docker container"""
-	dcmd = ["docker", "run","--name",container_name,"-v", "{}:{}".format(base_folder, base_folder),"-v", "{}:{}".format(reference_folder, reference_folder), image]
+	dcmd = ["docker",
+		"run",
+		"--name",
+		container_name,
+		"-v",
+		"{}:{}".format(self.input_folder, self.input_folder),
+		"-v",
+		"{}:{}".format(output_folder, output_folder),
+		"-v",
+		"{}:{}".format(reference_folder, reference_folder),
+		image]
 	dcmd += ["gatk"]
 	dcmd += ["--java-options" ,"-Djava.io.tmpdir="+java_tempdir]
 	dcmd += cmd
