@@ -423,14 +423,14 @@ class GATK4_somatic_TN_v1():
 			
 			# # Split BAM to chromosomes for parallel variant calling
 			# #	if chromosome_parallel==True:
-			# for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-				# extractChromosome(BaseRecalibrator_bam, chromosome)
+			for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
+				extractChromosome(BaseRecalibrator_bam, chromosome)
 		
-			# for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-				# addReadGroups_partial_bam(chromosome, BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam"))
+			for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
+				addReadGroups_partial_bam(chromosome, BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam"))
 		
-			# for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-				# indexBam(BaseRecalibrator_bam.replace(".bam",".chr"+chromosome+"_RG.bam"),t_n)	
+			for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
+				indexBam(BaseRecalibrator_bam.replace(".bam",".chr"+chromosome+"_RG.bam"),t_n)	
 			
 			
 	
@@ -449,14 +449,14 @@ class GATK4_somatic_TN_v1():
 		
 		### PARALLEL TUMOR- NORMAL VARIANT CALLING ###########################################################
 		
-		# proc = []
-		# for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-			# p = Process(target = variantCalling_mutect2_partial, args=[chromosome])
-			# p.start()
-			# proc.append(p)
+		proc = []
+		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
+			p = Process(target = variantCalling_mutect2_partial, args=[chromosome])
+			p.start()
+			proc.append(p)
 
-		# for p in proc:
-			# p.join()
+		for p in proc:
+			p.join()
 
 #		# VARIANT CALLING MUTECT2 WITHOUT PARALLELISATION (Check if variant calling was performed)
 #		if check_path(self.output_folder+self.sample_name+".mutect2.vcf.gz")==False:
@@ -467,7 +467,7 @@ class GATK4_somatic_TN_v1():
 		
 		
 		# join partial chromosome vcfs
-#		joinChromosomeVcfs()
+		joinChromosomeVcfs()
 
 		
 		
