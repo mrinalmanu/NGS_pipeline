@@ -170,7 +170,7 @@ class GATK4_somatic_TN_v1():
 		def processVcf(input_vcf, filename):
 			# decompose and normalize variants in vt 
 			cmd= ['/bin/bash -c "zcat '+input_vcf+' | vt decompose -s - | vt normalize -q - -n -r '+reference_fasta+' 2> /dev/null " | bgzip -c > '+filename+'normalized.vcf.gz']
-			self.run_in_docker(cmd, "asa","vt")
+			self.run_in_docker(cmd, "asa","vt",1)
 		
 		def filterMutectCalls(vcf_file):
 			# perform variant filtering
@@ -212,17 +212,17 @@ class GATK4_somatic_TN_v1():
 							"-o", vcf_file.replace(".vcf.gz",".annotated.vcf.gz"), 
 							"--vcf"]
 								
-			self.run_in_docker(annotate_cmd,"asa", "vep")
+			self.run_in_docker(annotate_cmd,"asa", "vep", self.threads)
 		
 		def indexVcf(vcf_file):
 			# index vcf file
 			index_cmd=["bcftools","index","-t","-f",vcf_file]
-			self.run_in_docker(index_cmd, "asa","bcftools")
+			self.run_in_docker(index_cmd, "asa","bcftools",1)
 		
 		def sortVcf(vcf_file):
 			# index vcf file
 			index_cmd=["bcftools","sort","-O z","-o",vcf_file.replace(".vcf.gz",".sort.vcf.gz"),vcf_file]
-			self.run_in_docker(index_cmd, "asa","bcftools")	
+			self.run_in_docker(index_cmd, "asa","bcftools",1)	
 	
 		def joinChromosomeVcfs():
 			joint_vcf = self.output_folder+self.sample_name+".mutect2.vcf.gz"
