@@ -55,7 +55,8 @@ class GATK_varscan_TN_v1():
 												level = logging.DEBUG,
 												format = LOG_FORMAT)
 		self.logger = logging.getLogger()
-	
+		
+	###################### RUN COMMANDS IN DOCKER CONTAINERS ###################
 	def run_in_docker(self, cmd,t_n, image, stdout=None, stderr=None):
 		""" Run a command inside docker container"""
 	
@@ -74,10 +75,25 @@ class GATK_varscan_TN_v1():
 		if stderr is not None:
 			stderr = open(stderr,"w")
 			self.open_files.append(stderr)
+		
+		############ LOCK DOWN NEEDED THREADS #############
+		threads_needed = int(threads_needed)
+		wait_go = "wait"
+		while wait_go !='go':
+			time.sleep(10)
+			wait_go = check_threads(batch_ID, container_name,"start",(-1)*threads_needed, max_threads)	
+		
+		########### RUN COMMAND IN DOCKER #################
 		self.logger.info("Running: "+" ".join(dcmd))
 		os.system(" ".join(dcmd))
 		checkContainer(container_name)
-	
+		
+		########### RELEASE LOCK DOWN CORES ###############
+		wait_go = "wait"
+		while wait_go !='go':
+			time.sleep(10)
+			wait_go = check_threads(batch_ID, container_name,"finish", threads_needed, max_threads)	
+	###################### END OF RUN COMMANDS IN DOCKER CONTAINERS ###################
 	
 	def run_pipeline(self):
 		#def run pipeline(self)
