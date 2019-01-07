@@ -92,6 +92,22 @@ def gatk_docker(tool, parameters_dict, log, ram, image):
 	dcmd += cmd
 	stderr = open(log,"w")
 	print >> sys.stderr, "GATK: "," ".join(dcmd)
-	#os.system(" ".join(dcmd))		
+	############ LOCK DOWN NEEDED THREADS #############
+	needed_threads = 1
+	
+	wait_go = "wait"
+	while wait_go !='go':
+		time.sleep(10)
+		wait_go = check_threads(batch_ID, container_name,"start",(-1)*needed_threads, max_threads)
+	
+	########### RUN COMMAND IN DOCKER #################
 	errcode = subprocess.call(dcmd, stderr=stderr)
+	checkContainer(container_name)
+	
+	########### RELEASE LOCK DOWN CORES ###############
+	wait_go = "wait"
+	while wait_go !='go':
+		time.sleep(10)
+		wait_go = check_threads(batch_ID, container_name,"finish", needed_threads, max_threads)	
+	
 	checkContainer(container_name)
