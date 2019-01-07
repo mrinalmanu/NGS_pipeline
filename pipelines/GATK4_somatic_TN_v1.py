@@ -8,6 +8,7 @@ import os
 from gatk4_docker import gatk_docker
 from multiprocessing import Process
 from config_file import *
+from lock_module import *
 
 
 def check_path(path):                		## Check if file exists
@@ -58,9 +59,8 @@ class GATK4_somatic_TN_v1():
 												format = LOG_FORMAT)
 		self.logger = logging.getLogger()
 	
-	def run_in_docker(self, cmd,t_n, image, stdout=None, stderr=None):
-		""" Run a command inside docker container"""
-		
+	###################### RUN COMMANDS IN DOCKER CONTAINERS ###################
+	def run_in_docker(self, cmd,t_n, image, threads_needed, stdout=None, stderr=None):
 		if len(cmd)<2:
 			container_name = self.sample_name+"_"+t_n+"_vt"
 		else:
@@ -68,10 +68,9 @@ class GATK4_somatic_TN_v1():
 	
 		checkContainer(container_name)
 		dcmd = ["docker", "run","--name",container_name,
-						"-v", "{}:{}".format(self.input_folder, self.input_folder),
-						"-v", "{}:{}".format(output_folder, output_folder),
+						"-v", "{}:{}".format(base_folder, base_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
-						image]
+						self.docker_images_dict[image]]
 		dcmd += cmd
 	
 		if stdout is not None:
@@ -81,9 +80,25 @@ class GATK4_somatic_TN_v1():
 		if stderr is not None:
 			stderr = open(stderr,"w")
 			self.open_files.append(stderr)
+		
+		############ LOCK DOWN NEEDED THREADS #############
+		threads_needed = int(threads_needed)
+		wait_go = "wait"
+		while wait_go !='go':
+			time.sleep(10)
+			wait_go = check_threads(batch_ID, container_name,"start",(-1)*threads_needed, max_threads)	
+		
+		########### RUN COMMAND IN DOCKER #################
 		self.logger.info("Running: "+" ".join(dcmd))
 		os.system(" ".join(dcmd))
 		checkContainer(container_name)
+		
+		########### RELEASE LOCK DOWN CORES ###############
+		wait_go = "wait"
+		while wait_go !='go':
+			time.sleep(10)
+			wait_go = check_threads(batch_ID, container_name,"finish", threads_needed, max_threads)	
+	###################### END OF RUN COMMANDS IN DOCKER CONTAINERS ###################
 	
 	
 	def run_pipeline(self):
