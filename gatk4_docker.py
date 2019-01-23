@@ -57,6 +57,8 @@ def gatk_docker(tool, parameters_dict, log, ram, image):
 									"static-quantized-quals":"--static-quantized-quals",
 									"emit-reference-confidence":"--ERC",
 									"max-alternate-alleles":"--max-alternate-alleles",
+									"stand-call-conf":"-stand-call-conf",
+									"dont-use-soft-clipped-bases":"--dont-use-soft-clipped-bases",
 									"MODE":"--MODE",
 									"variant":"-V"
 										}
