@@ -7,7 +7,7 @@ vt	quay.io/biocontainers/vt:0.57721--hf74b74d_1
 varscan	opengenomics/varscan:latest
 bcftools	bcftools:1.9
 vep	willmclaren/ensembl-vep:latest
-star  mgibio/star
+star  mgibio/star:2.5.2b
 
 #GATK4_germline_v1
 gatk	latest
