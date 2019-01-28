@@ -60,7 +60,7 @@ class GATK4_germline_v1():
 		self.logger = logging.getLogger()
 	
 	
-	def run_in_docker(self, cmd, image, stdout=None, stderr=None):
+	def run_in_docker(self, cmd, image, threads_needed, stdout=None, stderr=None):
 		""" Run a command inside docker container"""
 		
 		if len(cmd)<2:
@@ -135,7 +135,8 @@ class GATK4_germline_v1():
 				+self.threads+" "
 				+self.output_folder+self.sample_name+" "
 				+unsorted_bam],
-				"bwa_samtools131")
+				"bwa_samtools131",
+				self.threads)
 			
 		def markDuplicates():
 			# Mark duplicates (GATK)
@@ -224,7 +225,7 @@ class GATK4_germline_v1():
 				index_cmd = ['samtools','index',path]
 				index_log= output_folder+self.sample_name+".samtoolsindex.log"
 				#self.run_in_docker(index_cmd, stderr=index_log)
-				self.run_in_docker(index_cmd,self.docker_images_dict["samtools"])
+				self.run_in_docker(index_cmd,"samtools",1)
 			else:
 				raise RuntimeError("BaseRecalibrator bam file not found")
 				quit()
@@ -235,21 +236,21 @@ class GATK4_germline_v1():
 				sort_cmd += ['-@', '40']
 				sort_log= self.output_folder+self.sample_name+".samtoolssort.log"
 				#self.run_in_docker(index_cmd, stderr=index_log)
-				self.run_in_docker(sort_cmd, self.docker_images_dict["samtools"])
+				self.run_in_docker(sort_cmd,"samtools",1)
 			else:
 				raise RuntimeError("unsorted bam file not found")
 				quit()		
 		
 		def processVcf(input_vcf, filename):
 			cmd= ['/bin/bash -c "zcat '+input_vcf+' | vt decompose -s - | vt normalize -q - -n -r '+reference_fasta+' 2> /dev/null " | bgzip -c > '+filename+'normalized.vcf.gz']
-			self.run_in_docker(cmd, self.docker_images_dict["vt"])
+			self.run_in_docker(cmd,"vt",1)
 		
 		def extractChromosome(bam_file, chromosome):
 			index_cmd = ['samtools','view', bam_file, "chr"+chromosome, "-b","-o", bam_file.replace("bam","chr"+chromosome+".bam")]
 			index_cmd += ['-@', '40']
 			index_log= self.output_folder+self.sample_name+".samtools_split.log"
 			#self.run_in_docker(index_cmd, stderr=index_log)
-			self.run_in_docker(index_cmd,self.docker_images_dict["samtools"])
+			self.run_in_docker(index_cmd,"samtools",1)
 		
 		def joinChromosomeVcfs():
 			joint_vcf = self.output_folder+self.sample_name+".HaplotypeCaller.vcf.gz"
