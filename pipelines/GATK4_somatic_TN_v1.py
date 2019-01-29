@@ -68,9 +68,11 @@ class GATK4_somatic_TN_v1():
 	
 		checkContainer(container_name)
 		dcmd = ["docker", "run","--name",container_name,
-						"-v", "{}:{}".format(base_folder, base_folder),
+						"-v", "{}:{}".format(self.input_folder, self.input_folder),
+						"-v", "{}:{}".format(output_folder, output_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
-						self.docker_images_dict[image]]
+						self.docker_images_dict[image]
+		       				]
 		dcmd += cmd
 	
 		if stdout is not None:
