@@ -36,7 +36,7 @@ class GATK4_germline_v1():
 			print (self.sample_name+": ERROR: tumor FASTQ file specified in germline pipeline, aborting.")
 			quit()
 		self.input_folder=input_folder
-		self.threads = max_nr_threads
+		self.threads = max_threads_process
 		self.ram = "50000"
 		self.open_files = []
 		self.genome_build = genome_build
@@ -86,7 +86,7 @@ class GATK4_germline_v1():
 		wait_go = "wait"
 		while wait_go !='go':
 			time.sleep(10)
-			wait_go = check_threads(batch_ID, container_name,"start",(-1)*threads_needed, max_threads)	
+			wait_go = check_threads(batch_ID, container_name,"start",(-1)*threads_needed, max_nr_threads)	
 		
 		########### RUN COMMAND IN DOCKER #################
 		self.logger.info("Running: "+" ".join(dcmd))
@@ -97,7 +97,7 @@ class GATK4_germline_v1():
 		wait_go = "wait"
 		while wait_go !='go':
 			time.sleep(10)
-			wait_go = check_threads(batch_ID, container_name,"finish", threads_needed, max_threads)	
+			wait_go = check_threads(batch_ID, container_name,"finish", threads_needed, max_nr_threads)	
 	###################### END OF RUN COMMANDS IN DOCKER CONTAINERS ###################
 			
 	def run_pipeline(self):
@@ -138,11 +138,11 @@ class GATK4_germline_v1():
 				"bwa_samtools131",
 				self.threads)
 			
-		def markDuplicates():
+		def markDuplicates(input_bam):
 			# Mark duplicates (GATK)
 			parameters_dict = {
-								"input":unsorted_bam,
-								"output":markDuplicates_bam,
+								"input":input_bam,
+								"output":input_bam.replace("bam","MarkDuplicates.bam"),
 								"mark_dupl_metrics":markDuplicates_metrics,
 								"optical_duplicate_pixel_dist":"2500",
 								"assume_sort_order":"queryname",
@@ -156,7 +156,7 @@ class GATK4_germline_v1():
 		def addReadGroups():
 			# Add read groups (GATK)
 			parameters_dict = {
-								"input":markDuplicates_bam,
+								"input":unsorted_bam,
 								"output":ReadGroups_bam,
 								"RGLB":self.lib_ID,
 								"RGPL":self.pl_ID,
@@ -233,7 +233,7 @@ class GATK4_germline_v1():
 			if check_path(bam_to_sort) == True:
 				sort_cmd = ['samtools','sort', bam_to_sort]
 				sort_cmd += ['-o', sorted_bam]
-				sort_cmd += ['-@', '40']
+				sort_cmd += ['-@',self.threads]
 				sort_log= self.output_folder+self.sample_name+".samtoolssort.log"
 				#self.run_in_docker(index_cmd, stderr=index_log)
 				self.run_in_docker(sort_cmd,"samtools",1)
@@ -272,13 +272,6 @@ class GATK4_germline_v1():
 #			self.logger.info("alignment file present, checking integrity")
 #			validateSam()
 		
-		# Check if duplicated reads were marked
-		if check_path(self.output_folder+self.sample_name+".MarkDuplicates.bam")==False:
-			self.logger.info(self.sample_name+" sample: mark duplicates")
-			markDuplicates()
-		else:	
-			self.logger.info("duplicates marked, skipping...")
-		
 		# Check if readgroups were added
 		if check_path(self.output_folder+self.sample_name+".ReadGroups.bam")==False:
 			self.logger.info(self.sample_name+" sample: Add readgroups")
@@ -314,9 +307,21 @@ class GATK4_germline_v1():
 		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
 			indexBam(BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam"))	
 		
+		
 		proc = []
 		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-			p = Process(target = variantCalling_HaplotypeCaller, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam")])
+			p = Process(target = markDuplicates, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam")])
+			p.start()
+			proc.append(p)
+
+		for p in proc:
+			p.join()
+		
+		
+		
+		proc = []
+		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
+			p = Process(target = variantCalling_HaplotypeCaller, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".MarkDuplicates.bam")])
 			p.start()
 			proc.append(p)
 
