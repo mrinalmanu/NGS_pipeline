@@ -195,7 +195,7 @@ class GATK4_germline_v2():
 						BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"])
 
 			
-			def applyRecalibrator():
+		def applyRecalibrator():
 			# Base recalibrator - applying model (GATK)
 			print ""
 			print "STARTING APPLY RECALIBRATOR"
