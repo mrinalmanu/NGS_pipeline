@@ -1,5 +1,5 @@
-### GATK4 germline pipeline version 1.0
-### Pipeline created: 10/11/2018
+### GATK4 germline pipeline version 2.0
+### Pipeline created: 01/30/2019
 
 import sys
 import subprocess
@@ -8,6 +8,9 @@ import os
 from gatk4_docker import gatk_docker
 from multiprocessing import Process
 from config_file import *
+from lock_module import *
+import time
+import random
 
 def check_path(path):                		## Check if file exists
 			if os.path.exists(path) == True:
@@ -18,11 +21,11 @@ def check_path(path):                		## Check if file exists
 def checkContainer(container_name):
 		containers = subprocess.check_output(['docker','ps','-a']).decode(encoding="437")
 		if container_name in containers.split():
-			subprocess.call(["docker","rm",container_name])
+			subprocess.call(["docker","rm","-f",container_name])
 		else:
 			return				
 
-class GATK4_germline_v1():
+class GATK4_germline_v2():
 	def __init__(self, sample_name, genome_build, f1, f2,tf1,tf2, cleanup,lib_ID, pl_ID, pu_ID, docker_images_dict):
 		self.sample_name = sample_name
 		self.fastq1_tumor = tf1
@@ -37,6 +40,7 @@ class GATK4_germline_v1():
 			quit()
 		self.input_folder=input_folder
 		self.threads = max_threads_process
+		self.paralellized_threads = max_paralellized_threads
 		self.ram = "50000"
 		self.open_files = []
 		self.genome_build = genome_build
@@ -62,17 +66,19 @@ class GATK4_germline_v1():
 	
 	def run_in_docker(self, cmd, image, threads_needed, stdout=None, stderr=None):
 		""" Run a command inside docker container"""
-		
 		if len(cmd)<2:
-			container_name = self.sample_name+"_vt"
+			container_name = self.sample_name+"_vt"+"_"+''.join(random.choice('abcdefghijklmnoprstuvxyz') for _ in range(3))
 		else:
-			container_name = self.sample_name+"_"+cmd[0]
+			container_name = self.sample_name+"_"+cmd[0]+"_"+''.join(random.choice('abcdefghijklmnoprstuvxyz') for _ in range(3))
 		checkContainer(container_name)
+	
+		
 		dcmd = ["docker", "run","--name",container_name,
 						"-v", "{}:{}".format(self.input_folder, self.input_folder),
 						"-v", "{}:{}".format(output_folder, output_folder),
 						"-v", "{}:{}".format(reference_folder, reference_folder),
-						image]
+						self.docker_images_dict[image]
+						]
 		dcmd += cmd
 		if stdout is not None:
 			stdout = open(stdout,"w")
@@ -127,7 +133,9 @@ class GATK4_germline_v1():
 		
 		def align_BWA():
 			# Align to reference genome (bwa) and sort (samtools)
-		
+			print ""
+			print "STARTING BWA ALIGNMENT"
+			print ""
 			self.run_in_docker(["python align_bwa_sort_samtools.py "
 				+reference_fasta+" "
 				+self.fastq1+" "
@@ -155,6 +163,9 @@ class GATK4_germline_v1():
 		
 		def addReadGroups():
 			# Add read groups (GATK)
+			print ""
+			print "STARTING ADDING READGROUPS"
+			print ""
 			parameters_dict = {
 								"input":unsorted_bam,
 								"output":ReadGroups_bam,
@@ -169,6 +180,9 @@ class GATK4_germline_v1():
 	
 		def buildRecalibrator():
 			# Base recalibrator (GATK)
+			print ""
+			print "STARTING BUILDING RECALIBRATOR"
+			print ""
 			parameters_dict = {
 								"input":sorted_bam,
 								"output":BaseRecalibrator_metrics,
@@ -181,8 +195,11 @@ class GATK4_germline_v1():
 						BaseRecalibrator_log, self.ram,self.docker_images_dict["gatk"])
 
 			
-		def applyRecalibrator():
+			def applyRecalibrator():
 			# Base recalibrator - applying model (GATK)
+			print ""
+			print "STARTING APPLY RECALIBRATOR"
+			print ""
 			parameters_dict = {
 								"input":sorted_bam,
 								"output":BaseRecalibrator_bam,
@@ -236,7 +253,7 @@ class GATK4_germline_v1():
 				sort_cmd += ['-@',self.threads]
 				sort_log= self.output_folder+self.sample_name+".samtoolssort.log"
 				#self.run_in_docker(index_cmd, stderr=index_log)
-				self.run_in_docker(sort_cmd,"samtools",1)
+				self.run_in_docker(sort_cmd,"samtools",self.threads)
 			else:
 				raise RuntimeError("unsorted bam file not found")
 				quit()		
@@ -245,19 +262,29 @@ class GATK4_germline_v1():
 			cmd= ['/bin/bash -c "zcat '+input_vcf+' | vt decompose -s - | vt normalize -q - -n -r '+reference_fasta+' 2> /dev/null " | bgzip -c > '+filename+'normalized.vcf.gz']
 			self.run_in_docker(cmd,"vt",1)
 		
+		def sortVcf(vcf_file):
+			# index vcf file
+			index_cmd=["bcftools","sort","-O z","-o",vcf_file.replace(".vcf.gz",".sort.vcf.gz"),vcf_file]
+			self.run_in_docker(index_cmd,"bcftools",1)
+		
+		def indexVcf(vcf_file):
+			# index vcf file
+			index_cmd=["bcftools","index","-t","-f",vcf_file]
+			self.run_in_docker(index_cmd,"bcftools",1)
+		
 		def extractChromosome(bam_file, chromosome):
 			index_cmd = ['samtools','view', bam_file, "chr"+chromosome, "-b","-o", bam_file.replace("bam","chr"+chromosome+".bam")]
-			index_cmd += ['-@', '40']
+			index_cmd += ['-@', self.paralellized_threads]
 			index_log= self.output_folder+self.sample_name+".samtools_split.log"
 			#self.run_in_docker(index_cmd, stderr=index_log)
-			self.run_in_docker(index_cmd,"samtools",1)
+			self.run_in_docker(index_cmd,"samtools",self.paralellized_threads)
 		
 		def joinChromosomeVcfs():
 			joint_vcf = self.output_folder+self.sample_name+".HaplotypeCaller.vcf.gz"
 			partial_vcf_list = []
 			for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-				partial_vcf_list.append(BaseRecalibrator_bam.replace("bam","chr"+chromosome+".vcf.gz"))
-			os.system("bcftools concat -o "+joint_vcf+" -O z "+" ".join(partial_vcf_list))	
+				partial_vcf_list.append(BaseRecalibrator_bam.replace("bam","chr"+chromosome+".MarkDuplicates.vcf.gz"))
+			self.run_in_docker(["bcftools","concat","-o",joint_vcf,"-O","z"," ".join(partial_vcf_list)], "bcftools", self.threads)	
 					
 		#***********************************
 		# Pipeline workflow ###
@@ -300,52 +327,69 @@ class GATK4_germline_v1():
 		indexBam(BaseRecalibrator_bam)
 		
 		# Split BAM to chromosomes for parallel variant calling
-	#	if chromosome_parallel==True:
+		
+		proc = []
 		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-			extractChromosome(BaseRecalibrator_bam, chromosome)
+			p = Process(target = extractChromosome, args=[BaseRecalibrator_bam, chromosome])
+			p.start()
+			proc.append(p)
+		for p in proc:
+			p.join()	
 		
+		proc = []	
 		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
-			indexBam(BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam"))	
-		
-		
+			p = Process(target = indexBam, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam")])
+			p.start()
+			proc.append(p)
+		for p in proc:
+			p.join()
+			
 		proc = []
 		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
 			p = Process(target = markDuplicates, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".bam")])
 			p.start()
 			proc.append(p)
-
 		for p in proc:
 			p.join()
 		
-		
+		proc = []	
+		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
+			p = Process(target = indexBam, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".MarkDuplicates.bam")])
+			p.start()
+			proc.append(p)
+		for p in proc:
+			p.join()
 		
 		proc = []
 		for chromosome in ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X','Y','M']:
 			p = Process(target = variantCalling_HaplotypeCaller, args=[BaseRecalibrator_bam.replace("bam","chr"+chromosome+".MarkDuplicates.bam")])
 			p.start()
 			proc.append(p)
-
+		
 		for p in proc:
 			p.join()
 		
-		# Join chromosome vcf together
+		# # Join chromosome vcf together
 		
 		joinChromosomeVcfs()
 			
+		# PROCESS VCF in VT (check if already processed)
+		if check_path(self.output_folder+self.sample_name+".HaplotypeCaller.normalized.vcf.gz")==False:
+			vcf_file = self.output_folder+self.sample_name+".HaplotypeCaller.vcf.gz"
+			if check_path(vcf_file)==True:
+				processVcf(vcf_file, vcf_file.replace("vcf.gz",""))
+		else:
+			self.logger.info(self.sample_name+": vcf processing already done, skipping...")
 		
+		sortVcf(self.output_folder+self.sample_name+".HaplotypeCaller.normalized.vcf.gz")
 		
-	#	# Check if variant calling was performed
-	#	if check_path(self.output_folder+self.sample_name+".vcf.gz")==False:
-	#		self.logger.info(self.sample_name+" sample: variant calling")
-	#		variantCalling_HaplotypeCaller()
-	#	else:	
-	#		self.logger.info("variant calling already done, skipping...")
-		
-		# PROCESS VCF
-		vcf_file = self.output_folder+self.sample_name+".HaplotypeCaller.vcf.gz"
-		if check_path(vcf_file)==True:
-			self.logger.info(self.sample_name+" sample: vcf process")		
-			processVcf(vcf_file, vcf_file.replace("vcf.gz",""))
+		# Index normalized vcf (bcftools index vcf)
+		if check_path(self.output_folder+self.sample_name+".HaplotypeCaller.normalized.sort.vcf.gz.tbi")==False:
+			self.logger.info(self.sample_name+" sample: indexing")		
+			indexVcf(self.output_folder+self.sample_name+".HaplotypeCaller.normalized.sort.vcf.gz")
+		else:
+			self.logger.info(self.sample_name+" sample: normalized vcf indexed, skipping...")		
+			print ("")
 		
 		# Remove intermediate GATK-produced bams
 		if self.cleanup=="YES":
